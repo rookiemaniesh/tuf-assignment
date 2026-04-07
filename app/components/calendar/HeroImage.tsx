@@ -24,26 +24,61 @@ export default function HeroImage({
   onNext,
 }: HeroImageProps) {
   return (
-    <div className="relative w-full overflow-hidden" style={{ height: "300px" }}>
+    <div className="relative w-full overflow-hidden" style={{ height: "440px" }}>
 
-      {/* ── Spiral binding dots at the very top ── */}
+      {/* ── Hyper-Realistic Twin-Loop Spiral Binding ── */}
       <div
-        className="absolute top-0 left-0 right-0 z-30 flex justify-center gap-5 py-1"
-        style={{ background: "rgba(0,0,0,0.18)" }}
+        className="absolute top-0 left-0 w-full z-30 pointer-events-none"
+        style={{
+          height: "20px",
+          background: "#dde1e8"
+        }}
       >
-        {Array.from({ length: 14 }).map((_, i) => (
-          <div
-            key={i}
-            className="rounded-full"
-            style={{
-              width: 10,
-              height: 10,
-              background:
-                "radial-gradient(circle at 35% 35%, #d0d4da, #7a8090)",
-              boxShadow: "inset 0 1px 2px rgba(0,0,0,0.4), 0 1px 1px rgba(255,255,255,0.3)",
-            }}
-          />
-        ))}
+        <div className="w-full h-full flex justify-center items-start pt-1">
+          <svg width="550" height="52" viewBox="0 -2 510 48" className="overflow-visible select-none">
+            <defs>
+              <linearGradient id="metal" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#1e2024" />
+                <stop offset="25%" stopColor="#555a64" />
+                <stop offset="50%" stopColor="#7a808f" />
+                <stop offset="75%" stopColor="#3c3f48" />
+                <stop offset="100%" stopColor="#141518" />
+              </linearGradient>
+              <filter id="wire-shadow" x="-40%" y="-40%" width="180%" height="180%">
+                <feDropShadow dx="0" dy="2.5" stdDeviation="1.5" floodColor="#000" floodOpacity="0.45" />
+              </filter>
+            </defs>
+
+            {/* Loop groups */}
+            {Array.from({ length: 44 }).map((_, i) => {
+              if (i === 21 || i === 22) return null; // Gap for hanger
+
+              const x = i * 11.6 + 2;
+              return (
+                <g key={i} transform={`translate(${x}, 0)`}>
+                  {/* Punched hole */}
+                  <rect x="2.5" y="16" width="5.5" height="8" rx="1" fill="#151618" opacity="0.9" />
+                  <rect x="2.5" y="16" width="5.5" height="2" fill="#000" opacity="0.7" rx="1" />
+                  
+                  {/* Twin loops */}
+                  <path d="M 3.5,20 C 3.5,6 -0.5,3 4.5,3 C 9.5,3 6.5,6 6.5,20" fill="none" stroke="url(#metal)" strokeWidth="1.6" filter="url(#wire-shadow)" />
+                  <path d="M 5.5,20 C 5.5,6 1.5,3 6.5,3 C 11.5,3 8.5,6 8.5,20" fill="none" stroke="url(#metal)" strokeWidth="1.6" filter="url(#wire-shadow)" />
+                </g>
+              );
+            })}
+
+            {/* Center Calendar Hanger Hook */}
+            <path
+              d="M 246,18 L 251,4 C 251,0 252,-4 255,-4 C 258,-4 259,0 259,4 L 264,18"
+              fill="none"
+              stroke="url(#metal)"
+              strokeWidth="2.2"
+              filter="url(#wire-shadow)"
+              strokeLinejoin="round"
+              strokeLinecap="round"
+            />
+          </svg>
+        </div>
       </div>
 
       {/* ── Hero photograph ── */}
