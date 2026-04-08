@@ -86,7 +86,7 @@ export default function CalendarContainer() {
         style={{
           maxWidth: "560px",
           borderRadius: "6px",
-          boxShadow: "-10px 0 25px rgba(0,0,0,0.15)"
+          //boxShadow: "-10px 0 25px rgba(0,0,0,0.15)"
          // boxShadow: "0 8px 32px rgba(0,0,0,0.22), 0 2px 6px rgba(0,0,0,0.12)",
         }}
       >

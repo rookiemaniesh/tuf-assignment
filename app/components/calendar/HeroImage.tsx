@@ -55,15 +55,55 @@ export default function HeroImage({
 
               const x = i * 11.6 + 2;
               return (
-                <g key={i} transform={`translate(${x}, 0)`}>
-                  {/* Punched hole */}
-                  <rect x="2.5" y="16" width="5.5" height="8" rx="1" fill="#151618" opacity="0.9" />
-                  <rect x="2.5" y="16" width="5.5" height="2" fill="#000" opacity="0.7" rx="1" />
+                <g key={i} transform={`translate(${x},0)`}>
+
+  {/* PAPER HOLE */}
+  <rect
+    x="2.3"
+    y="15.5"
+    width="7"
+    height="9"
+    rx="1.2"
+    fill="#141518"
+  />
+  <rect
+    x="2.3"
+    y="15.5"
+    width="6"
+    height="2.3"
+    rx="1.2"
+    fill="#000"
+    opacity="0.7"
+  />
+
+  {/* FRONT WIRES */}
+  {/* FRONT WIRES */}
+<path
+  d="M3.6,16 C3.6,8 1.2,4 4.6,4 C8,4 5.6,8 5.6,20"
+  fill="none"
+  stroke="url(#metal)"
+  strokeWidth="1.6"
+  filter="url(#wire-shadow)"
+/>
+
+<path
+  d="M6.8,16 C6.8,8 4.4,4 7.8,4 C11.2,4 8.8,8 8.8,20"
+  fill="none"
+  stroke="url(#metal)"
+  strokeWidth="1.6"
+  filter="url(#wire-shadow)"
+/>
+
+</g>
+                // <g key={i} transform={`translate(${x}, 0)`}>
+                //   {/* Punched hole */}
+                //   <rect x="2.5" y="16" width="5.5" height="8" rx="1" fill="#151618" opacity="0.9" />
+                //   <rect x="2.5" y="16" width="5.5" height="2" fill="#000" opacity="0.7" rx="1" />
                   
-                  {/* Twin loops */}
-                  <path d="M 3.5,20 C 3.5,6 -0.5,3 4.5,3 C 9.5,3 6.5,6 6.5,20" fill="none" stroke="url(#metal)" strokeWidth="1.6" filter="url(#wire-shadow)" />
-                  <path d="M 5.5,20 C 5.5,6 1.5,3 6.5,3 C 11.5,3 8.5,6 8.5,20" fill="none" stroke="url(#metal)" strokeWidth="1.6" filter="url(#wire-shadow)" />
-                </g>
+                //   {/* Twin loops */}
+                //   <path d="M 3.5,20 C 3.5,6 -0.5,3 4.5,3 C 9.5,3 6.5,6 6.5,20" fill="none" stroke="url(#metal)" strokeWidth="1.6" filter="url(#wire-shadow)" />
+                //   <path d="M 5.5,20 C 5.5,6 1.5,3 6.5,3 C 11.5,3 8.5,6 8.5,20" fill="none" stroke="url(#metal)" strokeWidth="1.6" filter="url(#wire-shadow)" />
+                // </g>
               );
             })}
 
