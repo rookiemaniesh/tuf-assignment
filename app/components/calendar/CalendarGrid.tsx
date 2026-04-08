@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useMemo } from "react";
+import { dayKey, isSameDay, stripTime } from "../../lib/calendarUtils";
 import CalendarDay from "./CalendarDay";
 import { SelectedRange } from "./CalendarContainer";
 
@@ -17,23 +18,36 @@ interface CalendarGridProps {
   themeColor: string;
 }
 
-function isSameDay(a: Date, b: Date) {
-  return (
-    a.getFullYear() === b.getFullYear() &&
-    a.getMonth() === b.getMonth() &&
-    a.getDate() === b.getDate()
-  );
-}
 
-function stripTime(d: Date) {
-  return new Date(d.getFullYear(), d.getMonth(), d.getDate());
-}
+// Pure function — no closure dependencies, safe to live outside the component.
+function computeDayState(
+  date: Date,
+  isCurrentMonth: boolean,
+  today: Date,
+  range: { start: Date | null; end: Date | null }
+) {
+  const d = stripTime(date);
+  const isToday = isSameDay(d, stripTime(today));
+  const start = range.start ? stripTime(range.start) : null;
+  const end = range.end ? stripTime(range.end) : null;
 
-function dayKey(date: Date) {
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, "0");
-  const d = String(date.getDate()).padStart(2, "0");
-  return `${y}-${m}-${d}`;
+  let isStart = false;
+  let isEnd = false;
+  let isInRange = false;
+
+  if (start) {
+    isStart = isSameDay(d, start);
+    if (end) {
+      isEnd = isSameDay(d, end);
+      isInRange = d > start && d < end;
+    }
+  }
+
+  // Mon=0 … Sat=5, Sun=6
+  const dow = (date.getDay() + 6) % 7;
+  const isWeekend = dow >= 5;
+
+  return { isToday, isStart, isEnd, isInRange, isWeekend, isCurrentMonth, hasEnd: !!end };
 }
 
 export default function CalendarGrid({
@@ -78,30 +92,12 @@ export default function CalendarGrid({
     return grid;
   }, [year, month]);
 
-  const getDayState = (date: Date, isCurrentMonth: boolean) => {
-    const d = stripTime(date);
-    const isToday = isSameDay(d, stripTime(today));
-    const start = range.start ? stripTime(range.start) : null;
-    const end = range.end ? stripTime(range.end) : null;
-
-    let isStart = false;
-    let isEnd = false;
-    let isInRange = false;
-
-    if (start) {
-      isStart = isSameDay(d, start);
-      if (end) {
-        isEnd = isSameDay(d, end);
-        isInRange = d > start && d < end;
-      }
-    }
-
-    // Mon=0 … Sat=5, Sun=6
-    const dow = (date.getDay() + 6) % 7;
-    const isWeekend = dow >= 5;
-
-    return { isToday, isStart, isEnd, isInRange, isWeekend, isCurrentMonth, hasEnd: !!end };
-  };
+  // Compute all 42 cell states in one memoized pass.
+  // Re-runs only when cells, range, or today changes — not on themeColor/dayNotes changes.
+  const cellStates = useMemo(
+    () => cells.map(({ date, isCurrentMonth }) => computeDayState(date, isCurrentMonth, today, range)),
+    [cells, range, today]
+  );
 
   return (
     <div className="p-3 sm:pt-[14px] sm:pr-[16px] sm:pb-[16px] sm:pl-[12px]">
@@ -127,7 +123,7 @@ export default function CalendarGrid({
       {/* Day cells — 6 rows × 7 cols */}
       <div className="grid grid-cols-7">
         {cells.map(({ date, isCurrentMonth }, idx) => {
-          const state = getDayState(date, isCurrentMonth);
+          const state = cellStates[idx];
           const hasNote = isCurrentMonth && (dayNotes[dayKey(date)]?.length ?? 0) > 0;
           return (
             <CalendarDay

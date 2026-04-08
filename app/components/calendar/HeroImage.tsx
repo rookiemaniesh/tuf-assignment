@@ -22,7 +22,7 @@ export default function HeroImage({
   imageSrc,
 }: HeroImageProps) {
   return (
-    <div className="relative w-full overflow-hidden h-[240px] sm:h-[440px]">
+    <div className="relative w-full overflow-hidden h-[240px] sm:h-[320px] md:h-[440px]">
 
       {/* ── Hero photograph ── */}
       <Image

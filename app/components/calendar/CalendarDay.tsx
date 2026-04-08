@@ -1,6 +1,7 @@
 "use client";
 
-import React from "react";
+import React, { memo } from "react";
+import DayNotePopup, { clampPopupPosition } from "./DayNotePopup";
 
 interface CalendarDayProps {
   date: Date;
@@ -17,7 +18,7 @@ interface CalendarDayProps {
   onAddNote: (text: string) => void;
 }
 
-export default function CalendarDay({
+function CalendarDay({
   date,
   isCurrentMonth,
   isToday,
@@ -34,7 +35,6 @@ export default function CalendarDay({
   const dayNum = date.getDate();
   const [menuOpen, setMenuOpen] = React.useState(false);
   const [menuPos, setMenuPos] = React.useState<{ x: number; y: number } | null>(null);
-  const [noteDraft, setNoteDraft] = React.useState("");
 
   // ── Base text color ──
   let textColor = "#2d3340";
@@ -103,9 +103,9 @@ export default function CalendarDay({
         onContextMenu={(e) => {
           if (!isCurrentMonth) return;
           e.preventDefault();
-          setMenuPos({ x: e.clientX, y: e.clientY });
+          // Clamp so the popup never clips outside the viewport
+          setMenuPos(clampPopupPosition(e.clientX, e.clientY));
           setMenuOpen(true);
-          setNoteDraft("");
         }}
         onMouseEnter={(e) => {
           if (isCurrentMonth && !isEndpoint) {
@@ -128,7 +128,7 @@ export default function CalendarDay({
           style={{
             width: "6px",
             height: "6px",
-            borderRadius: "999px",
+            borderRadius: "50%",
             background: "#FACC15",
             bottom: "2px",
             left: "50%",
@@ -139,94 +139,25 @@ export default function CalendarDay({
       ) : null}
 
       {menuOpen && menuPos ? (
-        <div
-          className="fixed"
-          style={{ inset: 0, zIndex: 1000 }}
-          onMouseDown={() => setMenuOpen(false)}
-        >
-          <div
-            className="fixed bg-white"
-            style={{
-              left: menuPos.x,
-              top: menuPos.y,
-              border: "1px solid #e5e7eb",
-              borderRadius: "8px",
-              boxShadow: "0 10px 30px rgba(0,0,0,0.15)",
-              padding: "6px",
-              minWidth: "160px",
-            }}
-            onMouseDown={(e) => e.stopPropagation()}
-          >
-            <div
-              style={{
-                fontSize: "0.82rem",
-                padding: "8px 10px 6px",
-                fontWeight: 600,
-                color: "#111827",
-              }}
-            >
-              Add note
-            </div>
-
-            <input
-              autoFocus
-              value={noteDraft}
-              onChange={(e) => setNoteDraft(e.target.value)}
-              placeholder="Type note…"
-              className="w-full"
-              style={{
-                fontSize: "0.8rem",
-                padding: "8px 10px",
-                borderRadius: "6px",
-                border: "1px solid #e5e7eb",
-                outline: "none",
-              }}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault();
-                  if (noteDraft.trim()) onAddNote(noteDraft);
-                  setMenuOpen(false);
-                }
-                if (e.key === "Escape") {
-                  e.preventDefault();
-                  setMenuOpen(false);
-                }
-              }}
-            />
-
-            <div className="flex justify-end" style={{ gap: "8px", padding: "8px 4px 2px" }}>
-              <button
-                type="button"
-                style={{
-                  fontSize: "0.78rem",
-                  padding: "6px 8px",
-                  borderRadius: "6px",
-                  color: "#374151",
-                }}
-                onClick={() => setMenuOpen(false)}
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                style={{
-                  fontSize: "0.78rem",
-                  padding: "6px 10px",
-                  borderRadius: "6px",
-                  background: "#111827",
-                  color: "white",
-                }}
-                onClick={() => {
-                  if (noteDraft.trim()) onAddNote(noteDraft);
-                  setMenuOpen(false);
-                }}
-              >
-                Save
-              </button>
-            </div>
-          </div>
-        </div>
+        <DayNotePopup
+          date={date}
+          position={menuPos}
+          onSave={onAddNote}
+          onClose={() => setMenuOpen(false)}
+        />
       ) : null}
     </div>
   );
 }
+
+// Custom comparator — only re-render when visible state changes.
+// This prevents all 42 cells from re-rendering on every range selection update.
+export default memo(CalendarDay, (prev, next) =>
+  prev.isStart    === next.isStart    &&
+  prev.isEnd      === next.isEnd      &&
+  prev.isInRange  === next.isInRange  &&
+  prev.isToday    === next.isToday    &&
+  prev.hasNote    === next.hasNote    &&
+  prev.themeColor === next.themeColor &&
+  prev.isCurrentMonth === next.isCurrentMonth
+);

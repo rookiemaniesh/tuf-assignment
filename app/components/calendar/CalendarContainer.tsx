@@ -1,10 +1,12 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
+import { dayKey } from "../../lib/calendarUtils";
 import { motion, AnimatePresence } from "framer-motion";
 import HeroImage from "./HeroImage";
 import CalendarGrid from "./CalendarGrid";
 import NotesSection from "./NotesSection";
+import CalendarNavigation from "./CalendarNavigation";
 
 // Theme configurations for each month
 export const MONTH_CONFIGS = [
@@ -28,15 +30,32 @@ export interface SelectedRange {
 
 type DayNotes = Record<string, string[]>;
 
-function dayKey(date: Date) {
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, "0");
-  const d = String(date.getDate()).padStart(2, "0");
-  return `${y}-${m}-${d}`;
-}
+// ── Animation variants — defined at module level so the object reference
+// is stable and is not recreated on every render. ──
+const pageVariants = {
+  initial: (direction: number) => ({
+    rotateX: direction > 0 ? 90 : -90,
+    opacity: 0,
+    boxShadow: "0px 20px 40px rgba(0,0,0,0.5)",
+  }),
+  animate: {
+    rotateX: 0,
+    opacity: 1,
+    boxShadow: "0px 0px 0px rgba(0,0,0,0)",
+    transition: { duration: 0.6 },
+  },
+  exit: (direction: number) => ({
+    rotateX: direction < 0 ? 90 : -90,
+    opacity: 0,
+    boxShadow: "0px 20px 40px rgba(0,0,0,0.5)",
+    transition: { duration: 0.6 },
+  }),
+};
 
 export default function CalendarContainer() {
-  const today = new Date();
+  // Stable reference — avoids recreating a Date on every render
+  // and prevents a stale "today" if the calendar stays open past midnight.
+  const today = useMemo(() => new Date(), []);
   const [currentYear, setCurrentYear] = useState(today.getFullYear());
   const [currentMonth, setCurrentMonth] = useState(today.getMonth()); // 0-indexed
   const [direction, setDirection] = useState(0);
@@ -44,24 +63,17 @@ export default function CalendarContainer() {
   const [notes, setNotes] = useState("");
   const [dayNotes, setDayNotes] = useState<DayNotes>({});
 
-  // Load notes from localStorage
+  // Load both general notes and per-day notes whenever the visible month changes.
+  // Unified into one effect (single dependency array, one extra render instead of two).
   useEffect(() => {
-    const key = `calendar-notes-${currentYear}-${currentMonth}`;
-    const saved = localStorage.getItem(key);
-    if (saved) setNotes(saved);
-    else setNotes("");
-  }, [currentYear, currentMonth]);
+    // General notes
+    setNotes(localStorage.getItem(`calendar-notes-${currentYear}-${currentMonth}`) ?? "");
 
-  // Load per-day notes from localStorage
-  useEffect(() => {
-    const key = `calendar-day-notes-${currentYear}-${currentMonth}`;
-    const saved = localStorage.getItem(key);
-    if (!saved) {
-      setDayNotes({});
-      return;
-    }
+    // Per-day notes
+    const raw = localStorage.getItem(`calendar-day-notes-${currentYear}-${currentMonth}`);
+    if (!raw) { setDayNotes({}); return; }
     try {
-      const parsed = JSON.parse(saved) as DayNotes;
+      const parsed = JSON.parse(raw) as DayNotes;
       setDayNotes(parsed && typeof parsed === "object" ? parsed : {});
     } catch {
       setDayNotes({});
@@ -85,18 +97,25 @@ export default function CalendarContainer() {
 
       const k = dayKey(date);
 
-      setDayNotes((prev) => {
-        const next: DayNotes = { ...prev, [k]: [...(prev[k] ?? []), trimmed] };
-        const storageKey = `calendar-day-notes-${currentYear}-${currentMonth}`;
-        localStorage.setItem(storageKey, JSON.stringify(next));
-        return next;
-      });
+      // Compute the next value outside the updater so localStorage.setItem
+      // only runs once (React may call functional updaters twice in Strict Mode).
+      const nextDayNotes: DayNotes = {
+        ...dayNotes,
+        [k]: [...(dayNotes[k] ?? []), trimmed],
+      };
+      setDayNotes(nextDayNotes);
+      localStorage.setItem(
+        `calendar-day-notes-${currentYear}-${currentMonth}`,
+        JSON.stringify(nextDayNotes)
+      );
 
       const line = `${k}: ${trimmed}`;
-      const nextNotes = notes.trim().length ? `${notes.trimEnd()}\n${line}\n` : `${line}\n`;
+      const nextNotes = notes.trim().length
+        ? `${notes.trimEnd()}\n${line}\n`
+        : `${line}\n`;
       handleNotesChange(nextNotes);
     },
-    [currentYear, currentMonth, handleNotesChange, notes]
+    [currentYear, currentMonth, dayNotes, notes, handleNotesChange]
   );
 
   const handleDayClick = useCallback(
@@ -139,26 +158,6 @@ export default function CalendarContainer() {
     }
   }, [currentMonth]);
 
-  const pageVariants = {
-    initial: (direction: number) => ({
-      rotateX: direction > 0 ? 90 : -90,
-      opacity: 0,
-      boxShadow: "0px 20px 40px rgba(0,0,0,0.5)",
-    }),
-    animate: {
-      rotateX: 0,
-      opacity: 1,
-      boxShadow: "0px 0px 0px rgba(0,0,0,0)",
-      transition: { duration: 0.6 },
-    },
-    exit: (direction: number) => ({
-      rotateX: direction < 0 ? 90 : -90,
-      opacity: 0,
-      boxShadow: "0px 20px 40px rgba(0,0,0,0.5)",
-      transition: { duration: 0.6 },
-    }),
-  };
-
   return (
     <div
       className="flex items-center justify-center min-h-screen p-2 sm:p-6"
@@ -183,10 +182,10 @@ export default function CalendarContainer() {
           }}
         >
           <div className="w-full h-full flex justify-center items-start pt-1">
-            <svg 
-              className="w-[105%] sm:w-full h-auto max-w-[550px] overflow-visible select-none"
-              viewBox="0 16 510 48" 
-              preserveAspectRatio="xMidYMin slice"
+            <svg
+              className="w-full h-auto max-w-[550px] overflow-visible select-none"
+              viewBox="0 16 510 48"
+              preserveAspectRatio="xMidYMin meet"
             >
               <defs>
                 <linearGradient id="metal" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -250,32 +249,7 @@ export default function CalendarContainer() {
         </div>
 
         {/* ── Navigation arrows ── */}
-        <button
-          onClick={goToPrevMonth}
-          aria-label="Previous month"
-          className="absolute z-50 flex items-center justify-center w-8 h-8 rounded-full text-white transition-all duration-200 hover:scale-110 right-auto top-6 left-3 sm:top-11 sm:left-4"
-          style={{
-            background: "rgba(255,255,255,0.18)",
-            backdropFilter: "blur(4px)",
-          }}
-        >
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} className="w-4 h-4">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-          </svg>
-        </button>
-        <button
-          onClick={goToNextMonth}
-          aria-label="Next month"
-          className="absolute z-50 flex items-center justify-center w-8 h-8 rounded-full text-white transition-all duration-200 hover:scale-110 top-6 right-3 sm:top-11 sm:right-4 left-auto"
-          style={{
-            background: "rgba(255,255,255,0.18)",
-            backdropFilter: "blur(4px)",
-          }}
-        >
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} className="w-4 h-4">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-          </svg>
-        </button>
+        <CalendarNavigation onPrev={goToPrevMonth} onNext={goToNextMonth} />
 
         <AnimatePresence mode="popLayout" custom={direction} initial={false}>
           <motion.div
