@@ -62,10 +62,10 @@ function CalendarDay({
   const isEndpoint = isStart || isEnd;
   const circleStyle: React.CSSProperties = isEndpoint
     ? {
-        background: themeColor,
-        color: "white",
-        borderRadius: "50%",
-      }
+      background: themeColor,
+      color: "white",
+      borderRadius: "50%",
+    }
     : {};
 
   // Override text color for endpoints
@@ -82,9 +82,9 @@ function CalendarDay({
       className="flex items-center justify-center relative"
       style={{ height: "32px" }}
     >
-      <div 
-        className="absolute w-full" 
-        style={{ height: "28px", top: "2px", ...stripStyle }} 
+      <div
+        className="absolute w-full"
+        style={{ height: "28px", top: "2px", ...stripStyle }}
       />
       <button
         onClick={onClick}
@@ -153,11 +153,11 @@ function CalendarDay({
 // Custom comparator — only re-render when visible state changes.
 // This prevents all 42 cells from re-rendering on every range selection update.
 export default memo(CalendarDay, (prev, next) =>
-  prev.isStart    === next.isStart    &&
-  prev.isEnd      === next.isEnd      &&
-  prev.isInRange  === next.isInRange  &&
-  prev.isToday    === next.isToday    &&
-  prev.hasNote    === next.hasNote    &&
+  prev.isStart === next.isStart &&
+  prev.isEnd === next.isEnd &&
+  prev.isInRange === next.isInRange &&
+  prev.isToday === next.isToday &&
+  prev.hasNote === next.hasNote &&
   prev.themeColor === next.themeColor &&
   prev.isCurrentMonth === next.isCurrentMonth
 );
