@@ -37,7 +37,7 @@ export default function CalendarDay({
   const [noteDraft, setNoteDraft] = React.useState("");
 
   // ── Base text color ──
-  let textColor = "#2d3340"; // default: near-black
+  let textColor = "#2d3340";
   if (!isCurrentMonth) textColor = "#b9b9b9ff";
   else if (isWeekend) textColor = themeColor;
 

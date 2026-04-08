@@ -104,7 +104,7 @@ export default function CalendarGrid({
   };
 
   return (
-    <div style={{ padding: "14px 16px 16px 12px" }}>
+    <div className="p-3 sm:pt-[14px] sm:pr-[16px] sm:pb-[16px] sm:pl-[12px]">
       {/* Weekday header row */}
       <div className="grid grid-cols-7" style={{ marginBottom: "4px" }}>
         {WEEKDAYS.map((day, i) => (

@@ -13,8 +13,7 @@ const LINE_COUNT = 8;
 export default function NotesSection({ notes, onChange }: NotesSectionProps) {
   return (
     <div
-      className="h-full flex flex-col"
-      style={{ padding: " 2px 16px 58px" }}
+      className="h-full flex flex-col pt-2 px-3 pb-8 sm:pt-[2px] sm:px-[16px] sm:pb-[58px]"
     >
       <p
         className="text-xs tracking-widest  font-semibold"
