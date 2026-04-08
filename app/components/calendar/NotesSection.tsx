@@ -14,11 +14,10 @@ export default function NotesSection({ notes, onChange }: NotesSectionProps) {
   return (
     <div
       className="h-full flex flex-col"
-      style={{ padding: "18px 20px 16px 20px" }}
+      style={{ padding: " 2px 16px 58px" }}
     >
-      {/* "Notes" heading — small, gray, like printed text */}
       <p
-        className="text-xs tracking-widest uppercase mb-3 font-semibold"
+        className="text-xs tracking-widest  font-semibold"
         style={{ color: "#aab0bb", letterSpacing: "0.18em" }}
       >
         Notes
@@ -32,7 +31,7 @@ export default function NotesSection({ notes, onChange }: NotesSectionProps) {
             key={i}
             className="absolute left-0 right-0"
             style={{
-              top: `${(i + 1) * 28 - 1}px`,
+              top: `${(i + 1) * 22 - 1}px`,
               height: "1px",
               background: "#e2e5eb",
             }}
@@ -46,7 +45,7 @@ export default function NotesSection({ notes, onChange }: NotesSectionProps) {
           placeholder=""
           className="absolute inset-0 w-full h-full resize-none bg-transparent text-gray-700 text-xs"
           style={{
-            lineHeight: "28px",
+            lineHeight: "22px",
             paddingTop: "3px",
             border: "none",
             outline: "none",
@@ -56,13 +55,7 @@ export default function NotesSection({ notes, onChange }: NotesSectionProps) {
         />
       </div>
 
-      {/* Faint auto-saved hint */}
-      <p
-        className="text-right mt-2 text-xs"
-        style={{ color: "#c8cdd8", fontSize: "0.68rem" }}
-      >
-        auto-saved
-      </p>
+    
     </div>
   );
 }

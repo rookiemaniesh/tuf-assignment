@@ -89,7 +89,7 @@ export default function CalendarGrid({
     const dow = (date.getDay() + 6) % 7;
     const isWeekend = dow >= 5;
 
-    return { isToday, isStart, isEnd, isInRange, isWeekend, isCurrentMonth };
+    return { isToday, isStart, isEnd, isInRange, isWeekend, isCurrentMonth, hasEnd: !!end };
   };
 
   return (
@@ -103,7 +103,7 @@ export default function CalendarGrid({
             style={{
               fontSize: "0.62rem",
               paddingBottom: "4px",
-              color: i >= 5 ? themeColor : "#b0b8c6",
+              color: i >= 5 ? themeColor : "#000000ff",
               letterSpacing: "0.08em",
             }}
           >
@@ -112,8 +112,6 @@ export default function CalendarGrid({
         ))}
       </div>
 
-      {/* Thin separator under headers */}
-      <div style={{ height: "1px", background: "#edf0f4", marginBottom: "4px" }} />
 
       {/* Day cells — 6 rows × 7 cols */}
       <div className="grid grid-cols-7">

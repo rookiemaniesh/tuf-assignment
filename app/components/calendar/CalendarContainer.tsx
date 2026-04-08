@@ -5,9 +5,21 @@ import HeroImage from "./HeroImage";
 import CalendarGrid from "./CalendarGrid";
 import NotesSection from "./NotesSection";
 
-// Theme color used for overlay, weekend columns, and accents
-export const THEME_COLOR = "#2196F3"; // Vibrant blue matching the reference
-
+// Theme configurations for each month
+export const MONTH_CONFIGS = [
+  { image: "/jan.jpg", color: "#1D94D5" },   // Jan (Blue)
+  { image: "/feb.jpg", color: "#E83E8C" },   // Feb (Pinkish Red)
+  { image: "/march.jpg", color: "#28A745" }, // Mar (Green)
+  { image: "/april.jpg", color: "#FD7E14" }, // Apr (Orange)
+  { image: "/may.jpg", color: "#6F42C1" },   // May (Purple)
+  { image: "/june.jpg", color: "#FFC107" },  // Jun (Yellow/Gold)
+  { image: "/july.jpg", color: "#DC3545" },  // Jul (Red)
+  { image: "/august.jpg", color: "#20C997" },// Aug (Teal)
+  { image: "/sept.jpg", color: "#007BFF" },  // Sep (Deep Blue)
+  { image: "/oct.jpg", color: "#D35400" },   // Oct (Autumn)
+  { image: "/nov.jpg", color: "#6C757D" },   // Nov (Slate)
+  { image: "/dec.jpg", color: "#17A2B8" }    // Dec (Cyan)
+];
 export interface SelectedRange {
   start: Date | null;
   end: Date | null;
@@ -94,7 +106,8 @@ export default function CalendarContainer() {
         <HeroImage
           year={currentYear}
           month={currentMonth}
-          themeColor={THEME_COLOR}
+          themeColor={MONTH_CONFIGS[currentMonth].color}
+          imageSrc={MONTH_CONFIGS[currentMonth].image}
           onPrev={goToPrevMonth}
           onNext={goToNextMonth}
         />
@@ -104,7 +117,6 @@ export default function CalendarContainer() {
           {/* Notes — left on desktop, bottom on mobile */}
           <div
             className="order-2 sm:order-1 sm:w-[38%]"
-            style={{ borderRight: "1px solid #edf0f4" }}
           >
             <NotesSection notes={notes} onChange={handleNotesChange} />
           </div>
@@ -117,7 +129,7 @@ export default function CalendarContainer() {
               range={range}
               today={today}
               onDayClick={handleDayClick}
-              themeColor={THEME_COLOR}
+              themeColor={MONTH_CONFIGS[currentMonth].color}
             />
           </div>
         </div>

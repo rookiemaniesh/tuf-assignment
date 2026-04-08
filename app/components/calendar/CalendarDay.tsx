@@ -10,6 +10,7 @@ interface CalendarDayProps {
   isEnd: boolean;
   isInRange: boolean;
   isWeekend: boolean;
+  hasEnd: boolean;
   themeColor: string;
   onClick: () => void;
 }
@@ -22,6 +23,7 @@ export default function CalendarDay({
   isEnd,
   isInRange,
   isWeekend,
+  hasEnd,
   themeColor,
   onClick,
 }: CalendarDayProps) {
@@ -29,7 +31,7 @@ export default function CalendarDay({
 
   // ── Base text color ──
   let textColor = "#2d3340"; // default: near-black
-  if (!isCurrentMonth) textColor = "#cdd1da";
+  if (!isCurrentMonth) textColor = "#b9b9b9ff";
   else if (isWeekend) textColor = themeColor;
 
   // ── Range strip background (the horizontal tinted band) ──
@@ -37,18 +39,16 @@ export default function CalendarDay({
   if (isStart && isEnd) {
     // Single-day selection: no strip, just circle
     stripStyle = {};
-  } else if (isStart) {
+  } else if (isStart && hasEnd) {
     stripStyle = {
-      background: `${themeColor}1a`,
-      borderRadius: "50% 0 0 50%",
+      background: `linear-gradient(to right, transparent 50%, ${themeColor}22 50%)`,
     };
   } else if (isEnd) {
     stripStyle = {
-      background: `${themeColor}1a`,
-      borderRadius: "0 50% 50% 0",
+      background: `linear-gradient(to right, ${themeColor}22 50%, transparent 50%)`,
     };
   } else if (isInRange) {
-    stripStyle = { background: `${themeColor}1a` };
+    stripStyle = { background: `${themeColor}22` };
   }
 
   // ── Inner circle/dot styles for start & end ──
@@ -72,13 +72,17 @@ export default function CalendarDay({
 
   return (
     <div
-      className="flex items-center justify-center"
-      style={{ height: "32px", ...stripStyle }}
+      className="flex items-center justify-center relative"
+      style={{ height: "32px" }}
     >
+      <div 
+        className="absolute w-full" 
+        style={{ height: "28px", top: "2px", ...stripStyle }} 
+      />
       <button
         onClick={onClick}
         disabled={!isCurrentMonth}
-        className="flex items-center justify-center rounded-full transition-all duration-150 select-none"
+        className="flex items-center justify-center rounded-full transition-all duration-150 select-none relative z-10"
         style={{
           width: "28px",
           height: "28px",

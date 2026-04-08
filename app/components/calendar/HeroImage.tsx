@@ -12,6 +12,7 @@ interface HeroImageProps {
   year: number;
   month: number; // 0-indexed
   themeColor: string;
+  imageSrc: string;
   onPrev: () => void;
   onNext: () => void;
 }
@@ -20,6 +21,7 @@ export default function HeroImage({
   year,
   month,
   themeColor,
+  imageSrc,
   onPrev,
   onNext,
 }: HeroImageProps) {
@@ -134,42 +136,46 @@ export default function HeroImage({
 
       {/* ── Hero photograph ── */}
       <Image
-        src="/hero.png"
+        src={imageSrc}
         alt="Calendar hero"
         fill
         className="object-cover object-center"
         priority
         style={{ paddingTop: "18px" }}
       />
+      
 
-      {/* ── Geometric overlay: two rising triangles (mountain-peak zigzag) ── */}
-      {/*
-          The shape matches the reference: a blue band that starts from the
-          bottom-left corner, rises to a peak roughly 1/4 across, dips back
-          to the base, then rises again at ~55% to a taller peak (right side),
-          and fills the right corner—creating the classic wall-calendar wave.
-      */}
+      {/* ── Geometric overlay: separated banner shape ── */}
       <svg
         className="absolute bottom-0 left-0 w-full z-10"
-        viewBox="0 0 700 130"
+        viewBox="0 0 100 100"
         preserveAspectRatio="none"
-        style={{ height: "130px" }}
+        style={{ height: "180px", overflow: "visible" }}
       >
-        {/* Main wave / mountain-peak shape */}
+        {/* Blue band shape overlapping the image */}
         <path
-          d="M0,130 L0,90 L120,130 L240,55 L380,130 L700,130 Z"
+          d="M 0,25 
+             L 28,55 
+             Q 38,65 48,55 
+             L 100,-20 
+             L 100,120 
+             L 0,120 Z"
           fill={themeColor}
         />
-        {/* Right-side taller triangle for the date label area */}
+        {/* White shape masking the bottom of the blue band, blending into the UI area */}
         <path
-          d="M340,130 L500,10 L700,80 L700,130 Z"
-          fill={themeColor}
-          opacity="0.92"
+          d="M 0,65 
+             L 28,95 
+             Q 38,100 48,90 
+             L 100,50 
+             L 100,120 
+             L 0,120 Z"
+          fill="white"
         />
       </svg>
 
       {/* ── Month + Year label (sits on the right-hand blue triangle) ── */}
-      <div className="absolute bottom-5 right-7 text-right z-20">
+      <div className="absolute right-8 text-right z-20" style={{ bottom: "115px" }}>
         <span
           className="block font-light tracking-[0.22em]"
           style={{ color: "rgba(255,255,255,0.82)", fontSize: "0.95rem" }}
@@ -178,9 +184,9 @@ export default function HeroImage({
         </span>
         <span
           className="block font-extrabold tracking-[0.15em] leading-none"
-          style={{ color: "white", fontSize: "2rem" }}
+          style={{ color: "white", fontSize: "1.5rem" }}
         >
-          {MONTH_NAMES[month]}
+          {MONTH_NAMES[month]} 
         </span>
       </div>
 
@@ -190,7 +196,7 @@ export default function HeroImage({
         aria-label="Previous month"
         className="absolute z-30 flex items-center justify-center w-8 h-8 rounded-full text-white transition-all duration-200 hover:scale-110"
         style={{
-          top: "24px",
+          top: "44px",
           left: "12px",
           background: "rgba(255,255,255,0.18)",
           backdropFilter: "blur(4px)",
@@ -205,7 +211,7 @@ export default function HeroImage({
         aria-label="Next month"
         className="absolute z-30 flex items-center justify-center w-8 h-8 rounded-full text-white transition-all duration-200 hover:scale-110"
         style={{
-          top: "24px",
+          top: "44px",
           right: "12px",
           background: "rgba(255,255,255,0.18)",
           backdropFilter: "blur(4px)",
