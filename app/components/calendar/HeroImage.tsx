@@ -47,13 +47,42 @@ export default function HeroImage({
               <filter id="wire-shadow" x="-40%" y="-40%" width="180%" height="180%">
                 <feDropShadow dx="0" dy="2.5" stdDeviation="1.5" floodColor="#000" floodOpacity="0.45" />
               </filter>
+              <filter id="wire-shadow-h" filterUnits="userSpaceOnUse" x="-10" y="-10" width="530" height="50">
+                <feDropShadow dx="0" dy="2.5" stdDeviation="1.5" floodColor="#000" floodOpacity="0.45" />
+              </filter>
             </defs>
 
-            {/* Loop groups */}
-            {Array.from({ length: 44 }).map((_, i) => {
-              if (i === 21 || i === 22) return null; // Gap for hanger
+            
 
-              const x = i * 11.6 + 2;
+            {/* Unified Hanger & Horizontal Wire (Threaded inside loops) */}
+            <path
+              d="M 65,9 
+                 L 238,9 
+                 C 246,9 249,-2 255,-2 
+                 C 261,-2 264,9 272,9 
+                 L 445,9"
+              fill="none"
+              stroke="url(#metal)"
+              strokeWidth="2.4"
+              filter="url(#wire-shadow-h)"
+              strokeLinecap="round"
+            />
+            {/* Hanger Hook Plastic Clip */}
+            <rect
+              x="253.5"
+              y="-3.5"
+              width="3"
+              height="5"
+              rx="1.5"
+              fill="#141518"
+              filter="url(#wire-shadow-h)"
+            />
+
+            {/* Loop groups */}
+            {Array.from({ length: 32 }).map((_, i) => {
+              if (i === 15 || i === 16) return null; // Gap for hanger
+
+              const x = i * 16 + 4;
               return (
                 <g key={i} transform={`translate(${x},0)`}>
 
@@ -61,7 +90,7 @@ export default function HeroImage({
   <rect
     x="2.3"
     y="15.5"
-    width="7"
+    width="7.5"
     height="9"
     rx="1.2"
     fill="#141518"
@@ -75,6 +104,8 @@ export default function HeroImage({
     fill="#000"
     opacity="0.7"
   />
+  
+
 
   {/* FRONT WIRES */}
   {/* FRONT WIRES */}
@@ -95,28 +126,8 @@ export default function HeroImage({
 />
 
 </g>
-                // <g key={i} transform={`translate(${x}, 0)`}>
-                //   {/* Punched hole */}
-                //   <rect x="2.5" y="16" width="5.5" height="8" rx="1" fill="#151618" opacity="0.9" />
-                //   <rect x="2.5" y="16" width="5.5" height="2" fill="#000" opacity="0.7" rx="1" />
-                  
-                //   {/* Twin loops */}
-                //   <path d="M 3.5,20 C 3.5,6 -0.5,3 4.5,3 C 9.5,3 6.5,6 6.5,20" fill="none" stroke="url(#metal)" strokeWidth="1.6" filter="url(#wire-shadow)" />
-                //   <path d="M 5.5,20 C 5.5,6 1.5,3 6.5,3 C 11.5,3 8.5,6 8.5,20" fill="none" stroke="url(#metal)" strokeWidth="1.6" filter="url(#wire-shadow)" />
-                // </g>
               );
             })}
-
-            {/* Center Calendar Hanger Hook */}
-            <path
-              d="M 246,18 L 251,4 C 251,0 252,-4 255,-4 C 258,-4 259,0 259,4 L 264,18"
-              fill="none"
-              stroke="url(#metal)"
-              strokeWidth="2.2"
-              filter="url(#wire-shadow)"
-              strokeLinejoin="round"
-              strokeLinecap="round"
-            />
           </svg>
         </div>
       </div>
