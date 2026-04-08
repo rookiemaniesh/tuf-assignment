@@ -25,12 +25,22 @@ export interface SelectedRange {
   end: Date | null;
 }
 
+type DayNotes = Record<string, string[]>;
+
+function dayKey(date: Date) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
 export default function CalendarContainer() {
   const today = new Date();
   const [currentYear, setCurrentYear] = useState(today.getFullYear());
   const [currentMonth, setCurrentMonth] = useState(today.getMonth()); // 0-indexed
   const [range, setRange] = useState<SelectedRange>({ start: null, end: null });
   const [notes, setNotes] = useState("");
+  const [dayNotes, setDayNotes] = useState<DayNotes>({});
 
   // Load notes from localStorage
   useEffect(() => {
@@ -38,6 +48,22 @@ export default function CalendarContainer() {
     const saved = localStorage.getItem(key);
     if (saved) setNotes(saved);
     else setNotes("");
+  }, [currentYear, currentMonth]);
+
+  // Load per-day notes from localStorage
+  useEffect(() => {
+    const key = `calendar-day-notes-${currentYear}-${currentMonth}`;
+    const saved = localStorage.getItem(key);
+    if (!saved) {
+      setDayNotes({});
+      return;
+    }
+    try {
+      const parsed = JSON.parse(saved) as DayNotes;
+      setDayNotes(parsed && typeof parsed === "object" ? parsed : {});
+    } catch {
+      setDayNotes({});
+    }
   }, [currentYear, currentMonth]);
 
   // Save notes to localStorage
@@ -48,6 +74,27 @@ export default function CalendarContainer() {
       localStorage.setItem(key, val);
     },
     [currentYear, currentMonth]
+  );
+
+  const addNoteForDay = useCallback(
+    (date: Date, text: string) => {
+      const trimmed = text.trim();
+      if (!trimmed) return;
+
+      const k = dayKey(date);
+
+      setDayNotes((prev) => {
+        const next: DayNotes = { ...prev, [k]: [...(prev[k] ?? []), trimmed] };
+        const storageKey = `calendar-day-notes-${currentYear}-${currentMonth}`;
+        localStorage.setItem(storageKey, JSON.stringify(next));
+        return next;
+      });
+
+      const line = `${k}: ${trimmed}`;
+      const nextNotes = notes.trim().length ? `${notes.trimEnd()}\n${line}\n` : `${line}\n`;
+      handleNotesChange(nextNotes);
+    },
+    [currentYear, currentMonth, handleNotesChange, notes]
   );
 
   const handleDayClick = useCallback(
@@ -129,6 +176,8 @@ export default function CalendarContainer() {
               range={range}
               today={today}
               onDayClick={handleDayClick}
+              dayNotes={dayNotes}
+              onAddNote={addNoteForDay}
               themeColor={MONTH_CONFIGS[currentMonth].color}
             />
           </div>
