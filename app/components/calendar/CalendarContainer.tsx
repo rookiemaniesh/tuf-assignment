@@ -162,7 +162,7 @@ export default function CalendarContainer() {
   return (
     <div
       className="flex items-center justify-center min-h-screen p-2 sm:p-6"
-      style={{ background: "#dde1e8" }}
+      style={{ background: "radial-gradient(circle at 85% 15%, #ffffff 0%, #f0f1f5 40%, #e2e4e9 100%)" }}
     >
       <div
         className="w-full bg-white relative"
